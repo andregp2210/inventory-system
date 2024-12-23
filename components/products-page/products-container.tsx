@@ -5,8 +5,8 @@ import { Input } from "../ui/input";
 import DropdownFilter from "./dropdown-filter";
 import ProductCard from "./product-card";
 import { debounce } from "@/lib/utils";
-import ProductForm from "./product-form";
 import { createClient } from "@/utils/supabase/client";
+import { ProductFormDialog } from "./product-form-dialog";
 
 type Props = {
   products: {
@@ -54,15 +54,14 @@ export const ProductsContainer = ({ products }: Props) => {
   };
 
   const refetchProducts = async () => {
-    setShouldRefreshProducts(true);
     const { data } = await supabase.from("products").select();
-    debugger;
     if (data) {
       setBaseProducts(data);
     }
   };
 
   useEffect(() => {
+    console.log("shouldRefreshProducts ==>", shouldRefreshProducts);
     if (shouldRefreshProducts) {
       setShouldRefreshProducts(false);
       refetchProducts();
@@ -73,9 +72,11 @@ export const ProductsContainer = ({ products }: Props) => {
     setProductsList(baseProducts);
   }, [baseProducts]);
 
+  console.log("shouldRefreshProducts", shouldRefreshProducts);
+
   return (
     <section className="space-y-3 px-3">
-      <ProductForm setShouldRefreshProducts={setShouldRefreshProducts} />
+      <ProductFormDialog setShouldRefreshProducts={setShouldRefreshProducts}/>
       <div className="grid w-full max-w-sm items-center gap-1.5">
         <Input
           type="search"
@@ -98,6 +99,7 @@ export const ProductsContainer = ({ products }: Props) => {
             unitPrice={unitPrice}
             currentStock={currentStock}
             minimumStock={minimumStock}
+            setShouldRefreshProducts={setShouldRefreshProducts}
           />
         )
       )}
