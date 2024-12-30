@@ -35,7 +35,7 @@ export const SwalWrapper = ({
       didOpen: () => {
         const popup = Swal.getPopup();
         if (popup) {
-          popup.style.zIndex = "9"; // Set your desired z-index value
+          popup.style.zIndex = "9";
           popup.querySelector("input")?.focus();
         }
       },

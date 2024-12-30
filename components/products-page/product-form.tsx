@@ -1,4 +1,4 @@
-import type { FormikErrors, FormikHelpers, FormikProps } from "formik";
+import type { FormikHelpers, FormikProps } from "formik";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { Input } from "../ui/input";
@@ -13,9 +13,24 @@ import {
 import classNames from "classnames";
 
 const productFormSchema = Yup.object().shape({
-  skuCode: Yup.string().required("Código is required"),
-  name: Yup.string().required("Nombre is required"),
-  description: Yup.string().required("Descripción is required"),
+  skuCode: Yup.string()
+    .required("Código is required")
+    .min(3, "Código must be at least 3 characters")
+    .max(10, "Código must not exceed 10 characters"),
+  name: Yup.string()
+    .required("Nombre is required")
+    .min(3, "Nombre must be at least 3 characters"),
+  description: Yup.string().test(
+    "description-validation",
+    "Descripción must be at least 10 characters",
+    function(value) {
+      if (value && value.length > 0) {
+        return value.length >= 10;
+      }
+      return true; // Return true if the field is empty, as it's optional
+    }
+  )
+  .optional(),
   unitPrice: Yup.number()
     .typeError("Precio must be a valid number")
     .required("Precio is required")
@@ -24,35 +39,33 @@ const productFormSchema = Yup.object().shape({
     .typeError("Stock Actual must be a valid number")
     .required("Stock Actual is required")
     .integer("Stock Actual must be an integer")
-    .positive("Precio must be greater than zero"),
+    .min(0, "Stock Actual cannot be negative"),
   minimumStock: Yup.number()
     .typeError("Stock Mínimo must be a valid number")
     .required("Stock Mínimo is required")
     .integer("Stock Mínimo must be an integer")
-    .positive("Precio must be greater than zero"),
-  categoryId: Yup.number()
-    .typeError("Stock Actual must be a valid number")
-    .required("Stock Actual is required")
-    .integer("Stock Actual must be an integer")
-    .positive("Precio must be greater than zero"),
+    .min(0, "Stock Actual cannot be negative"),
+  categoryId: Yup.string().required("Categoría is required"),
 });
 
-interface IFormInput {
+export interface IFormInput {
   skuCode: string;
   name: string;
   description: string;
   unitPrice: number;
   currentStock: number;
   minimumStock: number;
-  categoryId: number;
+  categoryId: string;
 }
 
 export const ProductForm = ({
   categories,
   onSubmit,
+  ref,
 }: {
   categories: { id: number; name: string }[];
   onSubmit: (values: IFormInput, helpers: FormikHelpers<IFormInput>) => void;
+  ref?: React.Ref<FormikProps<IFormInput>>;
 }) => (
   <Formik<IFormInput>
     initialValues={{
@@ -62,12 +75,13 @@ export const ProductForm = ({
       unitPrice: 0,
       currentStock: 0,
       minimumStock: 0,
-      categoryId: 0,
+      categoryId: "",
     }}
     validationSchema={productFormSchema}
     onSubmit={onSubmit}
+    innerRef={ref}
   >
-    {({ errors, touched }) => (
+    {({ errors, touched, setFieldValue }) => (
       <Form>
         <div className="mb-4 text-left">
           <label className="block text-sm font-medium text-left mb-1">
@@ -124,7 +138,13 @@ export const ProductForm = ({
           <label className="block text-sm font-medium text-left mb-1">
             Categoría
           </label>
-          <Field as={Select} name="categoryId">
+          <Field
+            as={Select}
+            name="categoryId"
+            onValueChange={(value: string) =>
+              setFieldValue("categoryId", value)
+            }
+          >
             <SelectTrigger
               className={classNames("w-full rounded-xl", {
                 "border-red-500": errors.categoryId && touched.categoryId,
