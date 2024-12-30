@@ -18,15 +18,6 @@ export const ProductFormDialog = ({
   );
   const formikRef = useRef<FormikProps<IFormInput>>(null);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data } = await supabase.from("categories").select("id, name");
-      setCategories(data || []);
-    };
-
-    fetchCategories();
-  }, []);
-
   const handleFormSubmit = async (values: any) => {
     try {
       debugger;
@@ -44,6 +35,15 @@ export const ProductFormDialog = ({
       showErrorAlert("Could not connect to the server.");
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data } = await supabase.from("categories").select("id, name");
+      setCategories(data || []);
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <SwalWrapper

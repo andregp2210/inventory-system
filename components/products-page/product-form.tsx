@@ -20,17 +20,18 @@ const productFormSchema = Yup.object().shape({
   name: Yup.string()
     .required("Nombre is required")
     .min(3, "Nombre must be at least 3 characters"),
-  description: Yup.string().test(
-    "description-validation",
-    "Descripción must be at least 10 characters",
-    function(value) {
-      if (value && value.length > 0) {
-        return value.length >= 10;
+  description: Yup.string()
+    .test(
+      "description-validation",
+      "Descripción must be at least 10 characters",
+      function (value) {
+        if (value && value.length > 0) {
+          return value.length >= 10;
+        }
+        return true; // Return true if the field is empty, as it's optional
       }
-      return true; // Return true if the field is empty, as it's optional
-    }
-  )
-  .optional(),
+    )
+    .optional(),
   unitPrice: Yup.number()
     .typeError("Precio must be a valid number")
     .required("Precio is required")
@@ -52,31 +53,35 @@ export interface IFormInput {
   skuCode: string;
   name: string;
   description: string;
-  unitPrice: number;
-  currentStock: number;
-  minimumStock: number;
+  unitPrice: number | string;
+  currentStock: number | string;
+  minimumStock: number | string;
   categoryId: string;
 }
+
+const INITIAL_VALUES: IFormInput = {
+  skuCode: "",
+  name: "",
+  description: "",
+  unitPrice: "",
+  currentStock: "",
+  minimumStock: "",
+  categoryId: "",
+};
 
 export const ProductForm = ({
   categories,
   onSubmit,
   ref,
+  initialValues,
 }: {
   categories: { id: number; name: string }[];
   onSubmit: (values: IFormInput, helpers: FormikHelpers<IFormInput>) => void;
   ref?: React.Ref<FormikProps<IFormInput>>;
+  initialValues?: IFormInput;
 }) => (
   <Formik<IFormInput>
-    initialValues={{
-      skuCode: "",
-      name: "",
-      description: "",
-      unitPrice: 0,
-      currentStock: 0,
-      minimumStock: 0,
-      categoryId: "",
-    }}
+    initialValues={initialValues || INITIAL_VALUES}
     validationSchema={productFormSchema}
     onSubmit={onSubmit}
     innerRef={ref}
