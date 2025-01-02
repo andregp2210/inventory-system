@@ -1,5 +1,7 @@
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const MySwal = withReactContent(Swal);
 
@@ -12,6 +14,7 @@ export const SwalWrapper = ({
   onPreConfirm,
   onError,
   onSuccess,
+  isEdit = false,
 }: {
   title: string;
   Component: React.ElementType;
@@ -21,11 +24,12 @@ export const SwalWrapper = ({
   onPreConfirm: () => Promise<void>;
   onError?: () => void;
   onSuccess?: () => void;
+  isEdit?: boolean;
 }) => {
   const showSwal = () => {
     MySwal.fire({
       title,
-      html:( <Component {...componentProps} />),
+      html: <Component {...componentProps} />,
       showCancelButton: true,
       confirmButtonText,
       customClass: {
@@ -52,11 +56,13 @@ export const SwalWrapper = ({
   };
 
   return (
-    <button
+    <Button
+      variant={isEdit ? "outline" : "default"}
+      className="px-4 py-2 rounded-md hover:bg-blue-600 flex-1 mr-2"
       onClick={showSwal}
-      className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
     >
-      {openDialogText}
-    </button>
+      {isEdit && <Edit className="mr-2 h-4 w-4" />}
+      <span>{openDialogText}</span>
+    </Button>
   );
 };

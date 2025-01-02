@@ -13,7 +13,7 @@ export default function RootLayout({
   return (
     <main>
       <Header />
-      <section className="container mx-auto px-4">
+      <section className="container mx-auto px-4 mb-4">
       {children}
       </section>
     </main>
