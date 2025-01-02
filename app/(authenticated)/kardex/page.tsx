@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Search, ChevronDown } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Plus, Search, ChevronDown, RefreshCcw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,22 +21,13 @@ import {
 //   DialogHeader,
 //   DialogTitle,
 //   DialogTrigger,
-// } from "@/components/ui/dialog"
+// } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -45,94 +36,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { KardexSkeleton } from "./skeleton";
+import { AnimatePresence, motion } from "framer-motion";
 
-// Mock data for demonstration
-const initialKardexEntries = [
-  {
-    id: 1,
-    date: "2023-06-01",
-    type: "Purchase",
-    quantity: 100,
-    unitCost: 10,
-    totalCost: 1000,
-  },
-  {
-    id: 2,
-    date: "2023-06-15",
-    type: "Sale",
-    quantity: 50,
-    unitCost: 10,
-    totalCost: 500,
-  },
-  {
-    id: 3,
-    date: "2023-06-30",
-    type: "Purchase",
-    quantity: 75,
-    unitCost: 12,
-    totalCost: 900,
-  },
-  {
-    id: 4,
-    date: "2023-07-10",
-    type: "Purchase",
-    quantity: 120,
-    unitCost: 11,
-    totalCost: 1320,
-  },
-  {
-    id: 5,
-    date: "2023-07-25",
-    type: "Sale",
-    quantity: 80,
-    unitCost: 11,
-    totalCost: 880,
-  },
-  {
-    id: 6,
-    date: "2023-08-05",
-    type: "Purchase",
-    quantity: 150,
-    unitCost: 13,
-    totalCost: 1950,
-  },
-  {
-    id: 7,
-    date: "2023-08-20",
-    type: "Sale",
-    quantity: 100,
-    unitCost: 13,
-    totalCost: 1300,
-  },
-  {
-    id: 8,
-    date: "2023-09-01",
-    type: "Purchase",
-    quantity: 200,
-    unitCost: 14,
-    totalCost: 2800,
-  },
-  {
-    id: 9,
-    date: "2023-09-15",
-    type: "Sale",
-    quantity: 150,
-    unitCost: 14,
-    totalCost: 2100,
-  },
-  {
-    id: 10,
-    date: "2023-09-30",
-    type: "Purchase",
-    quantity: 250,
-    unitCost: 15,
-    totalCost: 3750,
-  },
-];
+// Simulated API functions
+const fetchKardexEntries = async () => {
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+  return JSON.parse(localStorage.getItem("kardexEntries") || "[]");
+};
+
+interface KardexEntry {
+  id?: number;
+  date: string;
+  type: string;
+  quantity: number;
+  unitCost: number;
+  totalCost?: number;
+}
+
+const addKardexEntry = async (entry: KardexEntry) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const entries = JSON.parse(localStorage.getItem("kardexEntries") || "[]");
+  const newEntry = { ...entry, id: entries.length + 1 };
+  entries.push(newEntry);
+  localStorage.setItem("kardexEntries", JSON.stringify(entries));
+  return newEntry;
+};
 
 export default function KardexPage() {
-  const [kardexEntries, setKardexEntries] = useState(initialKardexEntries);
-  const [filteredEntries, setFilteredEntries] = useState(initialKardexEntries);
+  const [kardexEntries, setKardexEntries] = useState<KardexEntry[]>([]);
+  const [filteredEntries, setFilteredEntries] = useState([]);
   const [newEntry, setNewEntry] = useState({
     date: "",
     type: "",
@@ -143,24 +77,48 @@ export default function KardexPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: string;
-    direction: "ascending" | "descending";
+    direction: string;
   } | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const observerTarget = useRef(null);
+  const { toast } = useToast();
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchKardexEntries();
+      setKardexEntries(data);
+      setLastUpdated(new Date());
+    } catch (err) {
+      setError("Failed to fetch kardex entries. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to fetch kardex entries. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     let result = kardexEntries;
     if (searchTerm) {
       result = result.filter(
-        (entry) =>
+        (entry: KardexEntry) =>
           entry.date.includes(searchTerm) ||
           entry.type.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     if (sortConfig !== null) {
       // result.sort((a, b) => {
-      //   /* eslint-disable @typescript-eslint/no-explicit-any */
-      //   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
       //   if (a[sortConfig.key] < b[sortConfig.key]) {
       //     return sortConfig.direction === "ascending" ? -1 : 1;
       //   }
@@ -170,33 +128,48 @@ export default function KardexPage() {
       //   return 0;
       // });
     }
-    setFilteredEntries(result);
+    setFilteredEntries(result as any);
   }, [kardexEntries, searchTerm, sortConfig]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setNewEntry((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSelectChange = (value: string) => {
+  const handleSelectChange = (value: any) => {
     setNewEntry((prev) => ({ ...prev, type: value }));
   };
 
-  const handleAddEntry = () => {
-    const entryToAdd = {
-      ...newEntry,
-      id: kardexEntries.length + 1,
-      quantity: parseInt(newEntry.quantity),
-      unitCost: parseFloat(newEntry.unitCost),
-      totalCost: parseInt(newEntry.quantity) * parseFloat(newEntry.unitCost),
-    };
-    setKardexEntries([...kardexEntries, entryToAdd]);
-    setNewEntry({ date: "", type: "", quantity: "", unitCost: "" });
-    setIsDialogOpen(false);
+  const handleAddEntry = async () => {
+    setIsLoading(true);
+    try {
+      const entryToAdd = {
+        ...newEntry,
+        quantity: parseInt(newEntry.quantity),
+        unitCost: parseFloat(newEntry.unitCost),
+        totalCost: parseInt(newEntry.quantity) * parseFloat(newEntry.unitCost),
+      };
+      const addedEntry = await addKardexEntry(entryToAdd);
+      setKardexEntries((prev) => [...prev, addedEntry]);
+      setNewEntry({ date: "", type: "", quantity: "", unitCost: "" });
+      setIsDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "New kardex entry added successfully.",
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to add new kardex entry. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const requestSort = (key: string) => {
-    let direction: "ascending" | "descending" = "ascending";
+  const requestSort = (key: any) => {
+    let direction = "ascending";
     if (
       sortConfig &&
       sortConfig.key === key &&
@@ -207,12 +180,70 @@ export default function KardexPage() {
     setSortConfig({ key, direction });
   };
 
-  const paginatedEntries = filteredEntries.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const handleExport = () => {
+    const csvContent = [
+      ["Date", "Type", "Quantity", "Unit Cost", "Total Cost"],
+      ...filteredEntries.map((entry: KardexEntry) => [
+        entry.date,
+        entry.type,
+        entry.quantity,
+        entry.unitCost,
+        entry.totalCost,
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
 
-  const pageCount = Math.ceil(filteredEntries.length / itemsPerPage);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "kardex_entries.csv");
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  // Infinite scrolling
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+          // Load more data here
+          // For this example, we'll just simulate loading more data
+          setTimeout(() => {
+            setKardexEntries((prev) => [
+              ...prev,
+              ...Array(5)
+                .fill(0)
+                .map((_, index) => ({
+                  id: prev.length + index + 1,
+                  date: "2023-10-01",
+                  type: "Purchase",
+                  quantity: 100,
+                  unitCost: 10,
+                  totalCost: 1000,
+                })),
+            ]);
+          }, 1000);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [isLoading]);
 
   return (
     <div className="space-y-6">
@@ -220,13 +251,27 @@ export default function KardexPage() {
         <h1 className="text-3xl font-bold text-emerald-700">
           Kardex Operations
         </h1>
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-wrap gap-2">
           <Input
             placeholder="Search entries..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-auto"
           />
+          <Button
+            onClick={fetchData}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
+          </Button>
+          <Button
+            onClick={handleExport}
+            variant="outline"
+            className="w-full sm:w-auto"
+          >
+            <Download className="mr-2 h-4 w-4" /> Export CSV
+          </Button>
           {/* <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto">
@@ -237,7 +282,8 @@ export default function KardexPage() {
               <DialogHeader>
                 <DialogTitle>Add New Kardex Entry</DialogTitle>
                 <DialogDescription>
-                  Enter the details of the new kardex entry here. Click save when you're done.
+                  Enter the details of the new kardex entry here. Click save
+                  when you're done.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -297,7 +343,9 @@ export default function KardexPage() {
                 </div>
               </div>
               <DialogFooter>
-                <Button type="submit" onClick={handleAddEntry}>Save changes</Button>
+                <Button type="submit" onClick={handleAddEntry}>
+                  Save changes
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog> */}
@@ -305,45 +353,69 @@ export default function KardexPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Kardex Entries</CardTitle>
+          <CardTitle className="flex justify-between items-center">
+            <span>Kardex Entries</span>
+            {lastUpdated && (
+              <span className="text-sm font-normal text-gray-500">
+                Last updated: {lastUpdated.toLocaleString()}
+              </span>
+            )}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead className="text-right">Unit Cost</TableHead>
-                  <TableHead className="text-right">Total Cost</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedEntries.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell className="font-medium">{entry.date}</TableCell>
-                    <TableCell>{entry.type}</TableCell>
-                    <TableCell className="text-right">
-                      {entry.quantity}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      ${entry.unitCost.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      ${entry.totalCost.toFixed(2)}
-                    </TableCell>
+            {isLoading ? (
+              <KardexSkeleton />
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[100px]">Date</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead className="text-right">Quantity</TableHead>
+                    <TableHead className="text-right">Unit Cost</TableHead>
+                    <TableHead className="text-right">Total Cost</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  <AnimatePresence>
+                    {filteredEntries.map((entry: KardexEntry) => (
+                      <motion.tr
+                        key={entry.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <TableCell className="font-medium">
+                          {entry.date}
+                        </TableCell>
+                        <TableCell>{entry.type}</TableCell>
+                        <TableCell className="text-right">
+                          {entry.quantity}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          ${entry.unitCost.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          ${entry.totalCost?.toFixed(2)}
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            )}
           </div>
+          <div ref={observerTarget} className="h-10" />
         </CardContent>
       </Card>
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="flex justify-between items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button variant="outline">
               Sort by <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -362,40 +434,6 @@ export default function KardexPage() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                className={
-                  currentPage === 1 ? "pointer-events-none opacity-50" : ""
-                }
-              />
-            </PaginationItem>
-            {[...Array(pageCount)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(i + 1)}
-                  isActive={currentPage === i + 1}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, pageCount))
-                }
-                className={
-                  currentPage === pageCount
-                    ? "pointer-events-none opacity-50"
-                    : ""
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
       </div>
     </div>
   );
