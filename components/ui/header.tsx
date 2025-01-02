@@ -1,5 +1,5 @@
 import React from "react";
-import { HamburguerIcon } from "./icons/hamburguer";
+import { MainNav } from "../nav-menu";
 
 
 
@@ -9,7 +9,7 @@ const Header = () => {
       <span className="text-white text-xl font-oswald leading-[28px]">
         EasyInventory
       </span>
-      <HamburguerIcon />
+      <MainNav/>
     </header>
   );
 };

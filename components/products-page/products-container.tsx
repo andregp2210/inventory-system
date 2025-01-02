@@ -7,15 +7,10 @@ import ProductCard from "./product-card";
 import { debounce } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { ProductFormDialog } from "./product-form-dialog";
+import { IPrudctForm } from "./product-form";
 
 type Props = {
-  products: {
-    skuCode: string;
-    name: string;
-    unitPrice: number;
-    currentStock: number;
-    minimumStock: number;
-  }[];
+  products: IPrudctForm[];
 };
 
 export const ProductsContainer = ({ products }: Props) => {
@@ -28,7 +23,7 @@ export const ProductsContainer = ({ products }: Props) => {
   const handleOrderByStock = (checked: boolean) => {
     if (checked) {
       const sortedProducts = [...productsList].sort(
-        (a, b) => a.currentStock - b.currentStock
+        (a, b) => Number(a.currentStock) - Number(b.currentStock)
       );
       setProductsList(sortedProducts);
     } else {
@@ -54,14 +49,13 @@ export const ProductsContainer = ({ products }: Props) => {
   };
 
   const refetchProducts = async () => {
-    const { data } = await supabase.from("products").select();
+    const { data } = await supabase.from("products").select().order("createdAt");
     if (data) {
       setBaseProducts(data);
     }
   };
 
   useEffect(() => {
-    console.log("shouldRefreshProducts ==>", shouldRefreshProducts);
     if (shouldRefreshProducts) {
       setShouldRefreshProducts(false);
       refetchProducts();
@@ -72,7 +66,6 @@ export const ProductsContainer = ({ products }: Props) => {
     setProductsList(baseProducts);
   }, [baseProducts]);
 
-  console.log("shouldRefreshProducts", shouldRefreshProducts);
 
   return (
     <section className="space-y-3 px-3">
@@ -91,14 +84,10 @@ export const ProductsContainer = ({ products }: Props) => {
         />
       </div>
       {productsList.map(
-        ({ skuCode, name, unitPrice, currentStock, minimumStock }, index) => (
+        (product, index) => (
           <ProductCard
             key={index}
-            skuCode={skuCode}
-            name={name}
-            unitPrice={unitPrice}
-            currentStock={currentStock}
-            minimumStock={minimumStock}
+            product={product}
             setShouldRefreshProducts={setShouldRefreshProducts}
           />
         )

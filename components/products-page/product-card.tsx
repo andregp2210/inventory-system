@@ -6,44 +6,36 @@ import LowStockPopOver from "./low-stock-pop-over";
 import { createClient } from "@/utils/supabase/client";
 import Swal from "sweetalert2";
 import { showErrorAlert, showSuccessAlert } from "../ui/swal-dialogs";
+import { ProductFormDialog } from "./product-form-dialog";
+import { IPrudctForm } from "./product-form";
 
 type Props = {
-  name: string;
-  skuCode: string;
-  unitPrice: number;
-  currentStock: number;
-  minimumStock: number;
+  product: IPrudctForm;
   setShouldRefreshProducts: (value: boolean) => void;
 };
 
-const ProductCard = ({
-  name,
-  skuCode,
-  unitPrice,
-  currentStock,
-  minimumStock,
-  setShouldRefreshProducts,
-}: Props) => {
+const ProductCard = ({ product, setShouldRefreshProducts }: Props) => {
+  const { skuCode, name, unitPrice, currentStock, minimumStock } =
+    product;
   const supabase = createClient();
   const isLowStock = currentStock < minimumStock;
 
-const handleDelete = async () => {
-  try {
-    const { data, error } = await supabase
-      .from("products")
-      .delete()
-      .eq("skuCode", skuCode);
-    if (error) {
-      showErrorAlert("Something went wrong. Please try again", error.message);
-    } else {
-      setShouldRefreshProducts(true);
-      showSuccessAlert("Your product was deleted successfully.");
+  const handleDelete = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .delete()
+        .eq("skuCode", skuCode);
+      if (error) {
+        showErrorAlert("Something went wrong. Please try again", error.message);
+      } else {
+        setShouldRefreshProducts(true);
+        showSuccessAlert("Your product was deleted successfully.");
+      }
+    } catch (error) {
+      showErrorAlert("Could not connect to the server.");
     }
-  } catch (error) {
-    showErrorAlert("Could not connect to the server.");
-  }
-}
-
+  };
 
   const handleOpenDeleteDialog = async () => {
     Swal.fire({
@@ -58,15 +50,11 @@ const handleDelete = async () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        handleDelete()
+        handleDelete();
       }
     });
-    
-  }
+  };
 
-  const handleEdit = () => {
-    // edit product
-  }
 
   return (
     <article
@@ -82,15 +70,18 @@ const handleDelete = async () => {
           Stock: {currentStock} {isLowStock ? <LowStockPopOver /> : null}
         </span>
       </div>
-      <p>Unit Price: {formatToLocalCurrency(unitPrice)}</p>
+      <p>Unit Price: {formatToLocalCurrency(unitPrice as number)}</p>
       <div className="space-x-3">
-        <Button>Edit</Button>
-        <Button variant="destructive" onClick={handleOpenDeleteDialog}>Delete</Button>
+        <ProductFormDialog
+          setShouldRefreshProducts={setShouldRefreshProducts}
+          product={product}
+        />
+        <Button variant="destructive" onClick={handleOpenDeleteDialog}>
+          Delete
+        </Button>
       </div>
     </article>
   );
 };
 
 export default ProductCard;
-
-

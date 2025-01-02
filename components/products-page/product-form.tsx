@@ -49,7 +49,7 @@ const productFormSchema = Yup.object().shape({
   categoryId: Yup.string().required("Categoría is required"),
 });
 
-export interface IFormInput {
+export interface IPrudctForm {
   skuCode: string;
   name: string;
   description: string;
@@ -59,7 +59,7 @@ export interface IFormInput {
   categoryId: string;
 }
 
-const INITIAL_VALUES: IFormInput = {
+const INITIAL_VALUES: IPrudctForm = {
   skuCode: "",
   name: "",
   description: "",
@@ -76,12 +76,12 @@ export const ProductForm = ({
   initialValues,
 }: {
   categories: { id: number; name: string }[];
-  onSubmit: (values: IFormInput, helpers: FormikHelpers<IFormInput>) => void;
-  ref?: React.Ref<FormikProps<IFormInput>>;
-  initialValues?: IFormInput;
+  onSubmit: (values: IPrudctForm, helpers: FormikHelpers<IPrudctForm>) => void;
+  ref?: React.Ref<FormikProps<IPrudctForm>>;
+  initialValues?: IPrudctForm;
 }) => (
-  <Formik<IFormInput>
-    initialValues={initialValues || INITIAL_VALUES}
+  <Formik<IPrudctForm>
+    initialValues={initialValues ? { ...initialValues, categoryId: initialValues.categoryId.toString() } : INITIAL_VALUES}
     validationSchema={productFormSchema}
     onSubmit={onSubmit}
     innerRef={ref}
