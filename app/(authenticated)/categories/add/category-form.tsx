@@ -71,7 +71,7 @@ export const CategoryForm = ({
             })}
           />
           {errors.name && touched.name && (
-            <p className="text-red-500 text-sm">{errors.name}</p>
+            <p className="text-red-500 text-sm">{errors.name.toString()}</p>
           )}
         </div>
 
@@ -88,7 +88,7 @@ export const CategoryForm = ({
             })}
           />
           {errors.description && touched.description && (
-            <p className="text-red-500 text-sm">{errors.description}</p>
+            <p className="text-red-500 text-sm">{errors.description.toString()}</p>
           )}
         </div>
       </Form>
