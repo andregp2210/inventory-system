@@ -88,7 +88,7 @@ const CategoryContainer = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => requestSort("name")}>
-              Name
+              Nombre
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
