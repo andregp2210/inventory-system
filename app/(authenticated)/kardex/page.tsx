@@ -45,20 +45,7 @@ import { KardexRecord } from "@/lib/types/movement";
 import { formatDate, formatToLocalCurrency } from "@/lib/utils";
 import CardContainer from "@/components/ui/card-container";
 
-// Simulated API functions
-const fetchKardexEntries = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-  return JSON.parse(localStorage.getItem("kardexEntries") || "[]");
-};
 
-const addKardexEntry = async (entry: KardexRecord) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  const entries = JSON.parse(localStorage.getItem("kardexEntries") || "[]");
-  const newEntry = { ...entry, id: entries.length + 1 };
-  entries.push(newEntry);
-  localStorage.setItem("kardexEntries", JSON.stringify(entries));
-  return newEntry;
-};
 
 export default function KardexPage() {
   const {
@@ -73,9 +60,6 @@ export default function KardexPage() {
     }
   );
 
-  // const [kardexEntries, setKardexEntries] = useState<KardexRecord[]>(
-  //   data || []
-  // );
   const [filteredEntries, setFilteredEntries] = useState<KardexRecord[]>([]);
   const [newEntry, setNewEntry] = useState({
     date: "",

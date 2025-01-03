@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 const MySwal = withReactContent(Swal);
 
@@ -26,6 +27,8 @@ export const SwalWrapper = ({
   onSuccess?: () => void;
   isEdit?: boolean;
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+
   const showSwal = () => {
     MySwal.fire({
       title,
@@ -38,6 +41,7 @@ export const SwalWrapper = ({
       },
       didOpen: () => {
         const popup = Swal.getPopup();
+        history.pushState({ swalOpen: true }, "SwalModal");
         if (popup) {
           popup.style.zIndex = "9";
           popup.querySelector("input")?.focus();
@@ -54,6 +58,36 @@ export const SwalWrapper = ({
       },
     });
   };
+
+  useEffect(() => {
+    
+    const closeSwal = () => {
+      if (modalOpen) {
+        Swal.close();
+        setModalOpen(false);
+      }
+    };
+
+    // Handle the back button event using the navigator object on mobile devices
+    const handleBackButton = (e: Event) => {
+      if (modalOpen) {
+        closeSwal();
+        e.preventDefault(); // Prevent the default back action
+      }
+    };
+
+    // Attach the back button listener on mobile devices
+    if (navigator.userAgent.match(/Android|iPhone|iPad|Mobile/i)) {
+      window.addEventListener("popstate", handleBackButton);
+
+      // Push a new state to history when Swal is opened
+      window.history.pushState(null, "", window.location.href);
+    }
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [modalOpen]);
 
   return (
     <Button
