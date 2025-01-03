@@ -42,6 +42,7 @@ export const SwalWrapper = ({
       didOpen: () => {
         const popup = Swal.getPopup();
         history.pushState({ swalOpen: true }, "SwalModal");
+        setModalOpen(true);
         if (popup) {
           popup.style.zIndex = "9";
           popup.querySelector("input")?.focus();
