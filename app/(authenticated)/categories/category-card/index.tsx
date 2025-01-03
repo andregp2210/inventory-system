@@ -1,11 +1,4 @@
 import { Trash2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import { Category } from "@/lib/types/category";
@@ -77,7 +70,7 @@ const CategoryCard = ({ category, getAllCategories }: Props) => {
               className="flex-1"
               onClick={handleOpenDeleteDialog}
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Delete
+              <Trash2 className="mr-2 h-4 w-4" /> Delete 
             </Button>
           </>
         }

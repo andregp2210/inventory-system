@@ -5,16 +5,24 @@ import { Input } from "../ui/input";
 import DropdownFilter from "./dropdown-filter";
 import ProductCard from "./product-card";
 import { debounce } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/client";
 import { ProductFormDialog } from "./product-form-dialog";
 import { IPrudctForm } from "./product-form";
+import { categoriesCrud, productsCrud } from "@/lib/queries";
+import { LoadingOverlay } from "../ui/loading-overlay";
+import { useRequest } from "@/hooks/use-request";
+import { Category } from "@/lib/types/category";
+import { Product } from "@/lib/types/product";
 
 type Props = {
-  products: IPrudctForm[];
+  products: Product[];
 };
 
 export const ProductsContainer = ({ products }: Props) => {
-  const supabase = createClient();
+  const [showLoader, setShowLoader] = useState(false);
+  const { data: categories = [] } = useRequest<Category[]>(
+    categoriesCrud.getAll,
+    "id, name"
+  );
   const [baseProducts, setBaseProducts] = useState(products);
   const [productsList, setProductsList] = useState(baseProducts);
   const [resetFilters, setResetFilters] = useState(false);
@@ -49,10 +57,13 @@ export const ProductsContainer = ({ products }: Props) => {
   };
 
   const refetchProducts = async () => {
-    const { data } = await supabase.from("products").select().order("createdAt");
+    setShowLoader(true);
+    const data = await productsCrud.getAll("");
+    //.order("createdAt");
     if (data) {
       setBaseProducts(data);
     }
+    setShowLoader(false);
   };
 
   useEffect(() => {
@@ -66,32 +77,38 @@ export const ProductsContainer = ({ products }: Props) => {
     setProductsList(baseProducts);
   }, [baseProducts]);
 
-
   return (
-    <section className="space-y-3 px-3">
-      <ProductFormDialog setShouldRefreshProducts={setShouldRefreshProducts}/>
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <Input
-          type="search"
-          id="search"
-          placeholder="Search"
-          onChange={handleSearch}
-        />
+    <>
+      {showLoader ? <LoadingOverlay message="Loading products..." /> : null}
+      <section className="space-y-3 px-3">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Input
+            type="search"
+            id="search"
+            placeholder="Search products..."
+            onChange={handleSearch}
+          />
+        </div>
         <DropdownFilter
+          variant="outline"
           label="Order by"
           handleOrderByStock={handleOrderByStock}
           resetFilters={resetFilters}
         />
-      </div>
-      {productsList.map(
-        (product, index) => (
+        <br />
+        <ProductFormDialog
+          setShouldRefreshProducts={setShouldRefreshProducts}
+          categories={categories || []}
+        />
+        {productsList.map((product, index) => (
           <ProductCard
             key={index}
             product={product}
+            categories={categories || []}
             setShouldRefreshProducts={setShouldRefreshProducts}
           />
-        )
-      )}
-    </section>
+        ))}
+      </section>
+    </>
   );
 };

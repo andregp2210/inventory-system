@@ -1,47 +1,56 @@
 import { useState, useEffect, useRef } from "react";
 import { SwalWrapper } from "@/components/ui/swal-wrapper";
 import { IPrudctForm, ProductForm } from "./product-form";
-import { createClient } from "@/utils/supabase/client";
 import { showErrorAlert, showSuccessAlert } from "../ui/swal-dialogs";
 import { FormikProps } from "formik";
 import Swal from "sweetalert2";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { LoadingOverlay } from "../ui/loading-overlay";
+import { categoriesCrud, productsCrud } from "@/lib/queries";
+import { Category } from "@/lib/types/category";
 
-const supabase = createClient();
+const LOADING_MESSAGES = ["Editing information...", "Adding products..."];
 
 export const ProductFormDialog = ({
   setShouldRefreshProducts,
   product,
+  categories,
 }: {
   setShouldRefreshProducts: (value: boolean) => void;
   product?: IPrudctForm;
+  categories: Category[];
 }) => {
-  const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
-  );
+  const [showLoader, setShowLoader] = useState(false);
   const formikRef = useRef<FormikProps<IPrudctForm>>(null);
 
   const handleAddProduct = async (values: any) => {
-    const { error } = await supabase.from("products").insert([values]).single();
-    if (error) {
-      showErrorAlert("Failed to add product", error.message);
-    } else {
+    setShowLoader(true);
+    try {
+      const data = await productsCrud.create(values);
       setShouldRefreshProducts(true);
       showSuccessAlert("Product added successfully!");
+    } catch (err) {
+      showErrorAlert(
+        "Failed to add product",
+        err instanceof Error ? err.message : "An error occurred"
+      );
     }
+    setShowLoader(false);
   };
 
   const handleEditProduct = async (values: any) => {
-    const { error } = await supabase
-      .from("products")
-      .update([values])
-      .match({ id: values.id });
-    if (error) {
-      showErrorAlert("Failed to edit product", error.message);
-    } else {
+    setShowLoader(true);
+    try {
+      const data = await productsCrud.update(values.id, values);
+      console.log(data);
       setShouldRefreshProducts(true);
       showSuccessAlert("Product edited successfully!");
+    } catch (err) {
+      showErrorAlert(
+        "Failed to edit product",
+        err instanceof Error ? err.message : "An error occurred"
+      );
     }
+    setShowLoader(false);
   };
 
   const handleFormSubmit = async (values: any) => {
@@ -56,37 +65,44 @@ export const ProductFormDialog = ({
     }
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data } = await supabase.from("categories").select("id, name");
-      setCategories(data || []);
-    };
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     const data = await categoriesCrud.getAll("id,name");
+  //     setCategories(data || []);
+  //   };
 
-    fetchCategories();
-  }, []);
-
+  //   fetchCategories();
+  // }, []);
   return (
-    <SwalWrapper
-      title="Register Product"
-      Component={ProductForm}
-      openDialogText={product ? "Edit" : "Add product"}
-      componentProps={{
-        categories,
-        onSubmit: handleFormSubmit,
-        ref: formikRef,
-        initialValues: product || undefined,
-      }}
-      onPreConfirm={async () => {
-        if (formikRef.current) {
-          await formikRef.current.submitForm();
-          const isValid = formikRef.current?.isValid;
-          if (!isValid) {
-            Swal.showValidationMessage(
-              "Please fix the errors in the form before submitting."
-            );
+    <>
+      {showLoader ? (
+        <LoadingOverlay
+          message={product ? LOADING_MESSAGES[0] : LOADING_MESSAGES[1]}
+        />
+      ) : null}
+      <SwalWrapper
+        title="Register Product"
+        Component={ProductForm}
+        openDialogText={product ? "Edit" : "Add product"}
+        isEdit={!!product}
+        componentProps={{
+          categories,
+          onSubmit: handleFormSubmit,
+          ref: formikRef,
+          initialValues: product || undefined,
+        }}
+        onPreConfirm={async () => {
+          if (formikRef.current) {
+            await formikRef.current.submitForm();
+            const isValid = formikRef.current?.isValid;
+            if (!isValid) {
+              Swal.showValidationMessage(
+                "Please fix the errors in the form before submitting."
+              );
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </>
   );
 };

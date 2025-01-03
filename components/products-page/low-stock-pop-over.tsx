@@ -22,15 +22,15 @@ const LowStockPopOver = () => {
       <PopoverTrigger asChild>
         <div>
           <InfoIcon
-            classNames={`ml-4 text-destructive fill-destructive  w-4 h-4 ${userReadMessage ? "" : "animate-ping"} `}
+            classNames={` absolute top-5 right-5 text-destructive fill-destructive  w-7 h-7 ${userReadMessage ? "" : "animate-ping"} `}
           />
         </div>
       </PopoverTrigger>
       <PopoverContent
         className="w-80"
         align="end"
-        sideOffset={5}
-        alignOffset={-10}
+        sideOffset={-35}
+        alignOffset={-5}
       >
         <div className="grid gap-4">
           <div className="space-y-2">
