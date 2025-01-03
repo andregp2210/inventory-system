@@ -41,7 +41,6 @@ export const SwalWrapper = ({
       },
       didOpen: () => {
         const popup = Swal.getPopup();
-        history.pushState({ swalOpen: true }, "SwalModal");
         setModalOpen(true);
         if (popup) {
           popup.style.zIndex = "9";
@@ -61,7 +60,6 @@ export const SwalWrapper = ({
   };
 
   useEffect(() => {
-    
     const closeSwal = () => {
       if (modalOpen) {
         Swal.close();
@@ -80,9 +78,6 @@ export const SwalWrapper = ({
     // Attach the back button listener on mobile devices
     if (navigator.userAgent.match(/Android|iPhone|iPad|Mobile/i)) {
       window.addEventListener("popstate", handleBackButton);
-
-      // Push a new state to history when Swal is opened
-      window.history.pushState(null, "", window.location.href);
     }
 
     return () => {
