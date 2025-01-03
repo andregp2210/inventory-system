@@ -4,6 +4,7 @@ type RequestResult<T> = {
   data: T | null;
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 };
 
 export const useRequest = <T>(
@@ -15,7 +16,6 @@ export const useRequest = <T>(
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    console.log({ crudMethod, params });
     try {
       setLoading(true);
       const result = await crudMethod(...params);
@@ -31,5 +31,5 @@ export const useRequest = <T>(
     fetchData();
   }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, refetch: fetchData };
 };

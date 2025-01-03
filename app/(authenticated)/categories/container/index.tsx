@@ -26,7 +26,7 @@ const CategoryContainer = ({
   error,
   getAllCategories,
 }: Props) => {
-  const [categories, setCategories] = useState<Category[]>(categoriesList);
+  const [categories] = useState<Category[]>(categoriesList);
   const [filteredCategories, setFilteredCategories] = useState(categories);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
