@@ -23,3 +23,28 @@ export const debounce = <T extends (...args: any[]) => void>(
     timeoutId = setTimeout(() => func(...args), delay);
   }) as T;
 };
+
+export function formatDate(
+  date: Date | string | number,
+  options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }
+): string {
+  if (!date) {
+    throw new Error("Invalid date provided.");
+  }
+
+  const parsedDate =
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date;
+
+  if (isNaN(parsedDate.getTime())) {
+    throw new Error("Invalid date format.");
+  }
+
+  const formatter = new Intl.DateTimeFormat("es-PE", options);
+  return formatter.format(parsedDate);
+}

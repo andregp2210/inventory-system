@@ -57,9 +57,11 @@ const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
+  <SheetPortal >
+    <SheetOverlay/>
     <SheetPrimitive.Content
+    role="dialog-content"
+    
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
       {...props}
@@ -107,6 +109,7 @@ const SheetTitle = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <SheetPrimitive.Title
+  role="dialog-title"
     ref={ref}
     className={cn("text-lg font-semibold text-foreground", className)}
     {...props}

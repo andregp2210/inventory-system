@@ -9,7 +9,7 @@ import { Skeleton } from "./skeleton";
 
 type CardContainerProps = {
   showLoader?: boolean;
-  title?: string;
+  title?: string | React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   loaderClassName?: string;
