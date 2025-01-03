@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   ResponsiveContainer,
@@ -14,61 +13,60 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-const salesData = [
-  { month: "Jan", sales: 4000 },
-  { month: "Feb", sales: 3000 },
-  { month: "Mar", sales: 5000 },
-  { month: "Apr", sales: 4500 },
-  { month: "May", sales: 6000 },
-  { month: "Jun", sales: 5500 },
-];
-
-const categoryData = [
-  { name: "Electronics", value: 400 },
-  { name: "Clothing", value: 300 },
-  { name: "Books", value: 200 },
-  { name: "Home", value: 100 },
-];
+import CardContainer from "@/components/ui/card-container";
+import useProductsData from "@/hooks/use-get-dashboard-data";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function Dashboard() {
+  const {
+    salesLoading,
+    categoriesLoading,
+    productsLoading,
+    lowStockProducts,
+    totalProducts,
+    outOfStock,
+    salesData,
+    productsByCategory,
+    salesError,
+    productsError,
+    categoriesError,
+  } = useProductsData();
+
   return (
     <div className="space-y-6">
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">120</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Low Stock Items</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">5</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Out of Stock</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">2</p>
-          </CardContent>
-        </Card>
+        <CardContainer title="Total Products" showLoader={productsLoading}>
+          {productsError ? (
+            <p className="text-red-500">{productsError}</p>
+          ) : (
+            <p className="text-4xl font-bold">{totalProducts}</p>
+          )}
+        </CardContainer>
+        <CardContainer title="Low Stock Items" showLoader={productsLoading}>
+          {productsError ? (
+            <p className="text-red-500">{productsError}</p>
+          ) : (
+            <p className="text-4xl font-bold">{lowStockProducts}</p>
+          )}
+        </CardContainer>
+        <CardContainer title="Out of Stock" showLoader={productsLoading}>
+          {productsError ? (
+            <p className="text-red-500">{productsError}</p>
+          ) : (
+            <p className="text-4xl font-bold">{outOfStock}</p>
+          )}
+        </CardContainer>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Monthly Sales</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <CardContainer
+          title="Monthly Sales"
+          showLoader={salesLoading}
+          loaderClassName="h-96 w-full"
+        >
+          {salesError ? (
+            <p className="text-red-500">{salesError}</p>
+          ) : (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={salesData}>
                 <XAxis dataKey="month" />
@@ -77,17 +75,23 @@ export default function Dashboard() {
                 <Bar dataKey="sales" fill="#10b981" />
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Categories</CardTitle>
-          </CardHeader>
-          <CardContent>
+          )}
+        </CardContainer>
+        <CardContainer
+          title="Products by Category"
+          showLoader={categoriesLoading || productsLoading}
+          loaderClassName="h-96 w-full"
+        >
+          {categoriesError || productsError ? (
+            <>
+              <p className="text-red-500">{categoriesError}</p>
+              <p className="text-red-500">{productsError}</p>
+            </>
+          ) : (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
-                  data={categoryData}
+                  data={productsByCategory}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
@@ -95,7 +99,7 @@ export default function Dashboard() {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {categoryData.map((entry, index) => (
+                  {productsByCategory.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={COLORS[index % COLORS.length]}
@@ -105,20 +109,20 @@ export default function Dashboard() {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          )}
+        </CardContainer>
       </div>
-      <div className="flex space-x-4">
+      <div className="flex flex-wrap">
         <Link href="/products">
-          <Button className="bg-emerald-600 hover:bg-emerald-700">
+          <Button variant="secondary" className="mr-2">
             View Products
           </Button>
         </Link>
         <Link href="/categories">
-          <Button variant="outline">Manage Categories</Button>
+          <Button variant="outline" className="mr-2">Manage Categories</Button>
         </Link>
         <Link href="/kardex">
-          <Button variant="outline">Kardex Operations</Button>
+          <Button variant="outline" className="mt-2">Kardex Operations</Button>
         </Link>
       </div>
     </div>

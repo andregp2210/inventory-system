@@ -9,19 +9,27 @@ import { Customer } from "../types/customer";
 
 const supabase = createClient();
 
+type RpcFunctionParams = Record<string, any>;
+
 type CrudOperations<T> = {
-  getAll: (columns?: string) => Promise<T[]>;
+  getAll: (
+    columns?: string,
+    filters?: { lte?: { column: string; value: number } }
+  ) => Promise<T[]>;
   getById: (id: number) => Promise<T | null>;
   create: (data: Partial<T>) => Promise<T | null>;
   update: (id: number, data: Partial<T>) => Promise<T | null>;
   remove: (id: number) => Promise<boolean>;
+  execFunction: (name: string, params?: RpcFunctionParams) => Promise<T |T[] | null>;
 };
 
 const createCrud = <T>(tableName: string): CrudOperations<T> => ({
-  async getAll(columns?: string): Promise<T[]> {
-    const { data, error } = (await supabase
-      .from(tableName)
-      .select(columns || "*")) as { data: T[] | null; error: any };
+  async getAll(columns, filters): Promise<T[]> {
+    let query = supabase.from(tableName).select(columns || "*");
+    if (filters?.lte) {
+      query = query.lte(filters.lte.column, filters.lte.value);
+    }
+    const { data, error } = (await query) as { data: T[] | null; error: any };
 
     if (error) throw new Error(error.message);
     return data || [];
@@ -60,6 +68,12 @@ const createCrud = <T>(tableName: string): CrudOperations<T> => ({
 
     if (error) throw new Error(error.message);
     return true;
+  },
+  async execFunction(name: string, params: any): Promise<any> {
+    const { data, error } = await supabase.rpc(name, params);
+
+    if (error) throw new Error(error.message);
+    return data;
   },
 });
 
