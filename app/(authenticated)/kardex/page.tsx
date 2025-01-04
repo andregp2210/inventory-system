@@ -22,11 +22,13 @@ import {
 
 import { KardexSkeleton } from "./skeleton";
 
-import { movementsCrud } from "@/lib/queries";
+import { movementsCrud, productsCrud } from "@/lib/queries";
 import { useRequest } from "@/hooks/use-request";
 import { KardexRecord } from "@/lib/types/movement";
 import CardContainer from "@/components/ui/card-container";
 import KardexTable from "./main-table";
+import { KardexFormDialog } from "./add/kardex-form-dialog";
+import { Product } from "@/lib/types/product";
 
 export default function KardexPage() {
   const {
@@ -41,6 +43,12 @@ export default function KardexPage() {
       year_filter: 2024,
     }
   );
+
+  const {
+    data: products,
+    loading: areProductsLoading,
+    error: productsError,
+  } = useRequest<Product[]>(productsCrud.getAll, "id, name");
 
   const [filteredEntries, setFilteredEntries] = useState<KardexRecord[]>([]);
 
@@ -60,7 +68,7 @@ export default function KardexPage() {
       result = result.filter(
         (entry: KardexRecord) =>
           entry.date.includes(searchTerm) ||
-          entry.type.toLowerCase().includes(searchTerm.toLowerCase())||
+          entry.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
           entry.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -176,6 +184,10 @@ export default function KardexPage() {
           >
             <Download className="mr-2 h-4 w-4" /> Export CSV
           </Button>
+          <KardexFormDialog
+            getAllMovements={refetchMovements}
+            products={products || []}
+          />
         </div>
       </div>
       <CardContainer

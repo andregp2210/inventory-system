@@ -3,6 +3,7 @@ import Image from "next/image";
 import { LoginImage } from "@/images";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Dashboard from "./(authenticated)/dashboard/page";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -11,10 +12,11 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Home",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  description: "The home page",
 };
 
 export default async function Home() {
+  return <Dashboard />;
   return (
     <>
       <main className="flex-1 flex flex-col gap-6 px-4">
@@ -38,5 +40,3 @@ export default async function Home() {
     </>
   );
 }
-
-

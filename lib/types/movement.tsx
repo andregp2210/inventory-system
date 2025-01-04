@@ -31,3 +31,11 @@ export type KardexRecord = {
   supplierName: string | null;
   notes: string | null;
 };
+
+export type KardexEntry = {
+  movementType: "entry" | "exit";
+  productId: number;
+  quantity: number;
+  locationId: number | null;
+  movementDate: string;
+};

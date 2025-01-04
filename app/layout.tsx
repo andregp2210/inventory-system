@@ -1,10 +1,11 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import Header from "@/components/ui/header";
 
 export const metadata = {
-  title: 'Inventory',
-  description: 'List of products',
-}
+  title: "Inventory",
+  description: "List of products",
+};
 
 const oswald = localFont({
   src: [
@@ -39,11 +40,14 @@ const oswald = localFont({
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" className={`${oswald.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Header />
+        <section className="container mx-auto px-4 mb-4">{children}</section>
+      </body>
     </html>
-  )
+  );
 }
