@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import DropdownFilter from "./dropdown-filter";
 import ProductCard from "./product-card";
 import { debounce } from "@/lib/utils";
 import { ProductFormDialog } from "./product-form-dialog";
 import { IPrudctForm } from "./product-form";
 import { categoriesCrud, productsCrud } from "@/lib/queries";
-import { LoadingOverlay } from "../ui/loading-overlay";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useRequest } from "@/hooks/use-request";
 import { Category } from "@/lib/types/category";
 import { Product } from "@/lib/types/product";

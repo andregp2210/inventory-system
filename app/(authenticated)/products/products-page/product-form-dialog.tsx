@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { SwalWrapper } from "@/components/ui/swal-wrapper";
 import { IPrudctForm, ProductForm } from "./product-form";
-import { showErrorAlert, showSuccessAlert } from "../ui/swal-dialogs";
+import { showErrorAlert, showSuccessAlert } from "@/components/ui/swal-dialogs";
 import { FormikProps } from "formik";
 import Swal from "sweetalert2";
-import { LoadingOverlay } from "../ui/loading-overlay";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { categoriesCrud, productsCrud } from "@/lib/queries";
 import { Category } from "@/lib/types/category";
 
@@ -65,14 +65,6 @@ export const ProductFormDialog = ({
     }
   };
 
-  // useEffect(() => {
-  //   const fetchCategories = async () => {
-  //     const data = await categoriesCrud.getAll("id,name");
-  //     setCategories(data || []);
-  //   };
-
-  //   fetchCategories();
-  // }, []);
   return (
     <>
       {showLoader ? (

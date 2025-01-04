@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { InfoIcon } from "../ui/icons/info";
+import { InfoIcon } from "@/components/ui/icons/info";
 import { useState } from "react";
 
 const LowStockPopOver = () => {

@@ -1,7 +1,7 @@
 import type { FormikHelpers, FormikProps } from "formik";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import classNames from "classnames";
 
 const productFormSchema = Yup.object().shape({

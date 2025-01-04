@@ -1,4 +1,4 @@
-import { ProductsContainer } from "@/components/products-page/products-container";
+import { ProductsContainer } from "./products-page/products-container";
 import { createClient } from "@/utils/supabase/server";
 
 import type { Metadata } from "next";

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Search, ChevronDown, RefreshCcw, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -13,45 +13,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
+
 import { KardexSkeleton } from "./skeleton";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { movementsCrud } from "@/lib/queries";
 import { useRequest } from "@/hooks/use-request";
 import { KardexRecord } from "@/lib/types/movement";
-import { formatDate, formatToLocalCurrency } from "@/lib/utils";
 import CardContainer from "@/components/ui/card-container";
-
-
+import KardexTable from "./main-table";
 
 export default function KardexPage() {
   const {
     data: kardexEntries,
-    loading,
+    loading: isLoading,
     error: movementError,
+    refetch: refetchMovements,
   } = useRequest<KardexRecord[]>(
     movementsCrud.execFunction,
     "get_kardex_data",
@@ -61,23 +43,15 @@ export default function KardexPage() {
   );
 
   const [filteredEntries, setFilteredEntries] = useState<KardexRecord[]>([]);
-  const [newEntry, setNewEntry] = useState({
-    date: "",
-    type: "",
-    quantity: "",
-    unitCost: "",
-  });
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: string;
   } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const observerTarget = useRef(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!kardexEntries) return;
@@ -86,60 +60,28 @@ export default function KardexPage() {
       result = result.filter(
         (entry: KardexRecord) =>
           entry.date.includes(searchTerm) ||
-          entry.type.toLowerCase().includes(searchTerm.toLowerCase())
+          entry.type.toLowerCase().includes(searchTerm.toLowerCase())||
+          entry.productName.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
     if (sortConfig !== null) {
-      // result.sort((a, b) => {
-      //   if (a[sortConfig.key] < b[sortConfig.key]) {
-      //     return sortConfig.direction === "ascending" ? -1 : 1;
-      //   }
-      //   if (a[sortConfig.key] > b[sortConfig.key]) {
-      //     return sortConfig.direction === "ascending" ? 1 : -1;
-      //   }
-      //   return 0;
-      // });
+      result.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
     }
-    console.log({ result });
+
     setFilteredEntries(result as any);
   }, [kardexEntries, searchTerm, sortConfig]);
 
-  const handleInputChange = (e: any) => {
-    const { name, value } = e.target;
-    setNewEntry((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleSelectChange = (value: any) => {
-    setNewEntry((prev) => ({ ...prev, type: value }));
+    //setNewEntry((prev) => ({ ...prev, type: value }));
   };
-
-  // const handleAddEntry = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const entryToAdd = {
-  //       ...newEntry,
-  //       quantity: parseInt(newEntry.quantity),
-  //       unitCost: parseFloat(newEntry.unitCost),
-  //       totalCost: parseInt(newEntry.quantity) * parseFloat(newEntry.unitCost),
-  //     };
-  //     const addedEntry = await addKardexEntry(entryToAdd);
-  //     setKardexEntries((prev) => [...prev, addedEntry]);
-  //     setNewEntry({ date: "", type: "", quantity: "", unitCost: "" });
-  //     setIsDialogOpen(false);
-  //     toast({
-  //       title: "Success",
-  //       description: "New kardex entry added successfully.",
-  //     });
-  //   } catch (err) {
-  //     toast({
-  //       title: "Error",
-  //       description: "Failed to add new kardex entry. Please try again.",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const requestSort = (key: any) => {
     let direction = "ascending";
@@ -180,45 +122,12 @@ export default function KardexPage() {
     }
   };
 
-  // // Infinite scrolling
-  // useEffect(() => {
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       if (entries[0].isIntersecting && !isLoading) {
-  //         // Load more data here
-  //         // For this example, we'll just simulate loading more data
-  //         setTimeout(() => {
-  //           setKardexEntries((prev) => [
-  //             ...prev,
-  //             ...Array(5)
-  //               .fill(0)
-  //               .map((_, index) => ({
-  //                 id: prev.length + index + 1,
-  //                 date: "2023-10-01",
-  //                 type: "Purchase",
-  //                 quantity: 100,
-  //                 unitCost: 10,
-  //                 totalCost: 1000,
-  //               })),
-  //           ]);
-  //         }, 1000);
-  //       }
-  //     },
-  //     { threshold: 1.0 }
-  //   );
+  useEffect(() => {
+    if (!isLoading && kardexEntries) {
+      setLastUpdated(new Date());
+    }
+  }, [isLoading, kardexEntries]);
 
-  //   if (observerTarget.current) {
-  //     observer.observe(observerTarget.current);
-  //   }
-
-  //   return () => {
-  //     if (observerTarget.current) {
-  //       observer.unobserve(observerTarget.current);
-  //     }
-  //   };
-  // }, [isLoading]);
-
-  console.log({ kardexEntries, filteredEntries });
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
@@ -232,8 +141,29 @@ export default function KardexPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-auto"
           />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                Sort by <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={() => requestSort("date")}>
+                Date
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => requestSort("type")}>
+                Type
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => requestSort("quantity")}>
+                Quantity
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => requestSort("totalCost")}>
+                Total Cost
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
-            onClick={() => {}}
+            onClick={refetchMovements}
             variant="outline"
             className="w-full sm:w-auto"
           >
@@ -246,83 +176,6 @@ export default function KardexPage() {
           >
             <Download className="mr-2 h-4 w-4" /> Export CSV
           </Button>
-          {/* <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-emerald-600 hover:bg-emerald-700 w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" /> Add Entry
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Kardex Entry</DialogTitle>
-                <DialogDescription>
-                  Enter the details of the new kardex entry here. Click save
-                  when you're done.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="date" className="text-right">
-                    Date
-                  </Label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    value={newEntry.date}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="type" className="text-right">
-                    Type
-                  </Label>
-                  <Select onValueChange={handleSelectChange}>
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Purchase">Purchase</SelectItem>
-                      <SelectItem value="Sale">Sale</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="quantity" className="text-right">
-                    Quantity
-                  </Label>
-                  <Input
-                    id="quantity"
-                    name="quantity"
-                    type="number"
-                    value={newEntry.quantity}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="unitCost" className="text-right">
-                    Unit Cost
-                  </Label>
-                  <Input
-                    id="unitCost"
-                    name="unitCost"
-                    type="number"
-                    step="0.01"
-                    value={newEntry.unitCost}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" onClick={handleAddEntry}>
-                  Save changes
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog> */}
         </div>
       </div>
       <CardContainer
@@ -339,93 +192,18 @@ export default function KardexPage() {
         }
       >
         <div className="overflow-x-auto">
-          {loading ? (
+          {isLoading ? (
             <KardexSkeleton />
           ) : movementError ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-500">{movementError}</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Date</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Product Name</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead className="text-right">Unit Cost</TableHead>
-                  <TableHead className="text-right">Total Cost</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {filteredEntries.map((entry: KardexRecord) => (
-                    <motion.tr
-                      key={entry.movementId}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <TableCell className="font-medium">
-                        {formatDate(entry.date, {
-                          year: "numeric",
-                          month: "numeric",
-                          day: "numeric",
-                        })}
-                      </TableCell>
-                      <TableCell>
-                        {entry.type === "entry" ? (
-                          <span className="px-3 py-1 text-sm font-semibold rounded-full text-white inline-block bg-emerald-500">
-                            Purchase
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 text-sm font-semibold rounded-full text-white inline-block bg-red-500">
-                            Sale
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>{entry.productName}</TableCell>
-                      <TableCell className="text-right">
-                        {entry.quantity}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatToLocalCurrency(entry.unitPrice)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatToLocalCurrency(entry.totalCost)}
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
+            <KardexTable records={filteredEntries} />
           )}
         </div>
         <div ref={observerTarget} className="h-10" />
       </CardContainer>
 
-      <div className="flex justify-between items-center">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Sort by <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => requestSort("date")}>
-              Date
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => requestSort("type")}>
-              Type
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => requestSort("quantity")}>
-              Quantity
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => requestSort("totalCost")}>
-              Total Cost
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <div className="flex justify-between items-center"></div>
     </div>
   );
 }

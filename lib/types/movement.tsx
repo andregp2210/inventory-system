@@ -17,6 +17,7 @@ export type Movement = {
 };
 
 export type KardexRecord = {
+  [key: string]: any;
   movementId: number;
   date: string;
   type: string;

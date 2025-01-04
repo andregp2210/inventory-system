@@ -90,7 +90,7 @@ export const SwalWrapper = ({
   return (
     <Button
       variant={isEdit ? "outline" : "default"}
-      className="px-4 py-2 rounded-md hover:bg-blue-600 flex-1 mr-2"
+      className="px-4 py-2 rounded-md flex-1 mr-2"
       onClick={showSwal}
     >
       {isEdit && <Edit className="mr-2 h-4 w-4" />}
