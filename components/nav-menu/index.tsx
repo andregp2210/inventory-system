@@ -12,12 +12,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu, Home, Package, FolderTree, FileSpreadsheet } from "lucide-react";
+import { MENU_ITEMS } from "@/utils/constants";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/products", label: "Products", icon: Package },
-  { href: "/categories", label: "Categories", icon: FolderTree },
-  { href: "/kardex", label: "Kardex", icon: FileSpreadsheet },
+  { href: "/dashboard", label: MENU_ITEMS[3], icon: Home },
+  { href: "/products", label: MENU_ITEMS[0], icon: Package },
+  { href: "/categories", label: MENU_ITEMS[1], icon: FolderTree },
+  { href: "/kardex", label: MENU_ITEMS[2], icon: FileSpreadsheet },
 ];
 
 export function MainNav() {

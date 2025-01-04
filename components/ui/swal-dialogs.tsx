@@ -18,11 +18,30 @@ export const showErrorAlert = (message: string, errorDetails?: string) => {
 export const showSuccessAlert = (message: string) => {
   Swal.fire({
     icon: "success",
-    title: "Success!",
+    title: "Perfecto!",
     text: message,
     customClass: {
       confirmButton: "bg-primary",
       cancelButton: "bg-destructive",
+    },
+  });
+};
+
+export const showDeleteAlert = async (functionToExecute: () => void) => {
+  Swal.fire({
+    title: "¿Seguro?",
+    text: "No podrás revertirlo!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Si, eliminar!",
+    cancelButtonText: "Cancelar",
+    customClass: {
+      confirmButton: "bg-primary",
+      cancelButton: "bg-destructive",
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      functionToExecute();
     }
   });
 };

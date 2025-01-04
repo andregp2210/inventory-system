@@ -19,12 +19,12 @@ const KardexTable = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Date</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Product Name</TableHead>
-          <TableHead className="text-right">Quantity</TableHead>
-          <TableHead className="text-right">Unit Cost</TableHead>
-          <TableHead className="text-right">Total Cost</TableHead>
+          <TableHead className="w-[100px]">Fecha</TableHead>
+          <TableHead>Tipo</TableHead>
+          <TableHead>Producto</TableHead>
+          <TableHead className="text-right">Cantidad</TableHead>
+          <TableHead className="text-right">Costo unitario</TableHead>
+          <TableHead className="text-right">Costo total</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -47,11 +47,11 @@ const KardexTable = ({
               <TableCell>
                 {entry.type === "entry" ? (
                   <span className="px-3 py-1 text-sm font-semibold rounded-full text-white inline-block bg-emerald-500">
-                    Purchase
+                    Compra
                   </span>
                 ) : (
                   <span className="px-3 py-1 text-sm font-semibold rounded-full text-white inline-block bg-red-500">
-                    Sale
+                    Venta
                   </span>
                 )}
               </TableCell>

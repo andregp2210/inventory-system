@@ -48,7 +48,7 @@ const DropdownFilter = ({
             handleOrderByStock(value);
           }}
         >
-          Stock
+          Existencias
         </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>

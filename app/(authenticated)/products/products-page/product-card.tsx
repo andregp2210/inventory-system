@@ -5,7 +5,11 @@ import { formatToLocalCurrency } from "@/lib/utils";
 import { InfoIcon } from "@/components/ui/icons/info";
 import LowStockPopOver from "./low-stock-pop-over";
 import Swal from "sweetalert2";
-import { showErrorAlert, showSuccessAlert } from "@/components/ui/swal-dialogs";
+import {
+  showDeleteAlert,
+  showErrorAlert,
+  showSuccessAlert,
+} from "@/components/ui/swal-dialogs";
 import { ProductFormDialog } from "./product-form-dialog";
 import { IPrudctForm } from "./product-form";
 import CardContainer from "@/components/ui/card-container";
@@ -34,10 +38,10 @@ const ProductCard = ({
       setShowLoader(true);
       await productsCrud.remove(product.id);
       setShouldRefreshProducts(true);
-      showSuccessAlert("Your product was deleted successfully.");
+      showSuccessAlert("Su producto se ha eliminado correctamente.");
     } catch (err) {
       showErrorAlert(
-        "Failed to delete product",
+        "No se ha podido eliminar el producto",
         err instanceof Error ? err.message : "An error occurred"
       );
     } finally {
@@ -46,21 +50,7 @@ const ProductCard = ({
   };
 
   const handleOpenDeleteDialog = async () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      customClass: {
-        confirmButton: "bg-primary",
-        cancelButton: "bg-destructive",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        handleDelete();
-      }
-    });
+    showDeleteAlert(handleDelete);
   };
 
   return (
@@ -82,7 +72,7 @@ const ProductCard = ({
               className="flex-1"
               onClick={handleOpenDeleteDialog}
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Delete 
+              <Trash2 className="mr-2 h-4 w-4" /> Eliminar
             </Button>
           </>
         }
@@ -91,7 +81,7 @@ const ProductCard = ({
         <p className="text-lg text-gray-600">SKU: {skuCode}</p>
         <p className="text-lg text-gray-600">Stock: {currentStock}</p>
         <p className="text-lg text-gray-600">
-          Unit Price: {formatToLocalCurrency(unitPrice as number)}
+          Precio Unitario: {formatToLocalCurrency(unitPrice as number)}
         </p>
       </CardContainer>
     </>

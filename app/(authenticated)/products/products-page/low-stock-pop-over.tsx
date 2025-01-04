@@ -35,7 +35,7 @@ const LowStockPopOver = () => {
         <div className="grid gap-4">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Warning this product is under its minimum stock.
+              Advertencia este producto está por debajo de su stock mínimo.
             </p>
           </div>
         </div>

@@ -74,7 +74,7 @@ const CategoryContainer = ({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Input
-            placeholder="Search categories..."
+            placeholder="Buscar categorías..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-auto"
@@ -83,7 +83,7 @@ const CategoryContainer = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">
-              Sort by <ChevronDown className="ml-2 h-4 w-4" />
+              Ordenar por <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
@@ -101,7 +101,7 @@ const CategoryContainer = ({
             getAllCategories={getAllCategories}
           />
         ) : (
-          <h1>Loading...</h1>
+          <h1>Cargando categorías...</h1>
         )}
       </div>
     </>

@@ -9,7 +9,7 @@ import { LoadingOverlay } from "@/components/ui/loading-overlay"; // Loading spi
 import { KardexEntry, KardexRecord } from "@/lib/types/movement"; // Interface for the Kardex form data
 import { Product } from "@/lib/types/product";
 
-const LOADING_MESSAGES = ["Editing movement...", "Adding movement..."];
+const LOADING_MESSAGES = ["Editando movimiento...", "Agregando movimiento..."];
 
 export const KardexFormDialog = ({
   movement,
@@ -34,11 +34,11 @@ export const KardexFormDialog = ({
         movementDate: values.movementDate,
       };
       await movementsCrud.create(valuesToSend);
-      showSuccessAlert("Movement added successfully!");
+      showSuccessAlert("¡Movimiento añadido con éxito!");
       getAllMovements();
     } catch (err) {
       showErrorAlert(
-        "Failed to add movement",
+        "Fallo al añadir movimiento",
         err instanceof Error ? err.message : "An error occurred"
       );
     } finally {
@@ -50,11 +50,11 @@ export const KardexFormDialog = ({
     try {
       setShowLoader(true);
       await movementsCrud.update(Number(values.id), { ...values }); // Assuming movement has an id
-      showSuccessAlert("Movement edited successfully!");
+      showSuccessAlert("¡Movimiento editado con éxito!");
       getAllMovements();
     } catch (err) {
       showErrorAlert(
-        "Failed to edit movement",
+        "Fallo al editar movimiento",
         err instanceof Error ? err.message : "An error occurred"
       );
     } finally {
@@ -82,10 +82,10 @@ export const KardexFormDialog = ({
         />
       )}
       <SwalWrapper
-        title="Register Movement"
+        title={movement ? "Editar Movimiento" : "Agregar Movimiento"}
         Component={KardexForm} // The form component to use
         isEdit={!!movement}
-        openDialogText={movement ? "Edit Movement" : "Add Movement"}
+        openDialogText={movement ? "Editar" : "Agregar movimiento"}
         componentProps={{
           onSubmit: handleFormSubmit,
           ref: formikRef,
@@ -98,7 +98,7 @@ export const KardexFormDialog = ({
             const isValid = formikRef.current?.isValid;
             if (!isValid) {
               Swal.showValidationMessage(
-                "Please fix the errors in the form before submitting."
+                "Por favor, corrija los errores del formulario antes de enviarlo."
               );
             }
           }

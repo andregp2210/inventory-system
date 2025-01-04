@@ -14,16 +14,16 @@ import classNames from "classnames";
 
 const productFormSchema = Yup.object().shape({
   skuCode: Yup.string()
-    .required("Código is required")
-    .min(3, "Código must be at least 3 characters")
-    .max(10, "Código must not exceed 10 characters"),
+    .required("El código es obligatorio")
+    .min(3, "El código debe tener al menos 3 caracteres")
+    .max(10, "El código no debe superar los 10 caracteres"),
   name: Yup.string()
-    .required("Nombre is required")
-    .min(3, "Nombre must be at least 3 characters"),
+    .required("El nombre es obligatorio")
+    .min(3, "El nombre debe tener al menos 3 caracteres"),
   description: Yup.string()
     .test(
       "description-validation",
-      "Descripción must be at least 10 characters",
+      "La descripción debe tener al menos 10 caracteres",
       function (value) {
         if (value && value.length > 0) {
           return value.length >= 10;
@@ -33,20 +33,20 @@ const productFormSchema = Yup.object().shape({
     )
     .optional(),
   unitPrice: Yup.number()
-    .typeError("Precio must be a valid number")
-    .required("Precio is required")
-    .positive("Precio must be greater than zero"),
+    .typeError("El precio debe ser un número válido")
+    .required("El precio es obligatorio")
+    .positive("El precio debe ser mayor a cero"),
   currentStock: Yup.number()
-    .typeError("Stock Actual must be a valid number")
-    .required("Stock Actual is required")
-    .integer("Stock Actual must be an integer")
-    .min(0, "Stock Actual cannot be negative"),
+    .typeError("El stock actual debe ser un número válido")
+    .required("El stock actual es obligatorio")
+    .integer("El stock actual debe ser un número entero")
+    .min(0, "El stock actual no puede ser negativo"),
   minimumStock: Yup.number()
-    .typeError("Stock Mínimo must be a valid number")
-    .required("Stock Mínimo is required")
-    .integer("Stock Mínimo must be an integer")
-    .min(0, "Stock Actual cannot be negative"),
-  categoryId: Yup.string().required("Categoría is required"),
+    .typeError("El stock mínimo debe ser un número válido")
+    .required("El stock mínimo es obligatorio")
+    .integer("El stock mínimo debe ser un número entero")
+    .min(0, "El stock mínimo no puede ser negativo"),
+  categoryId: Yup.string().required("La categoría es obligatoria"),
 });
 
 export interface IPrudctForm {
@@ -81,7 +81,11 @@ export const ProductForm = ({
   initialValues?: IPrudctForm;
 }) => (
   <Formik<IPrudctForm>
-    initialValues={initialValues ? { ...initialValues, categoryId: initialValues.categoryId.toString() } : INITIAL_VALUES}
+    initialValues={
+      initialValues
+        ? { ...initialValues, categoryId: initialValues.categoryId.toString() }
+        : INITIAL_VALUES
+    }
     validationSchema={productFormSchema}
     onSubmit={onSubmit}
     innerRef={ref}

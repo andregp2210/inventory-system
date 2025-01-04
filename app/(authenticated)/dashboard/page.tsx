@@ -17,21 +17,21 @@ import CardContainer from "@/components/ui/card-container";
 import useProductsData from "@/hooks/use-get-dashboard-data";
 
 const COLORS = [
-  "#FF6F61", // Rojo coral vibrante
-  "#FFA177", // Naranja brillante
-  "#FFD966", // Amarillo mostaza claro
-  "#8FBC8F", // Verde salvia
-  "#87CEFA", // Azul cielo brillante
-  "#9370DB", // Lila intenso
-  "#FF69B4", // Rosa chicle
-  "#4682B4", // Azul acero claro
-  "#90EE90", // Verde claro vibrante
-  "#FFB347", // Naranja melocotón
-  "#FF4040", // Rojo vivo
-  "#7B68EE", // Azul violeta
-  "#66CDAA", // Verde aguamarina
-  "#FFC0CB", // Rosa pastel marcado
-  "#FFA500", // Naranja vibrante
+  "#FF6F61",
+  "#FFA177",
+  "#FFD966",
+  "#8FBC8F",
+  "#87CEFA",
+  "#9370DB",
+  "#FF69B4",
+  "#4682B4",
+  "#90EE90",
+  "#FFB347",
+  "#FF4040",
+  "#7B68EE",
+  "#66CDAA",
+  "#FFC0CB",
+  "#FFA500",
 ];
 
 export default function Dashboard() {
@@ -54,23 +54,26 @@ export default function Dashboard() {
       <div className="flex flex-wrap">
         <Link href="/products">
           <Button variant="secondary" className="mr-2">
-            View Products
+            Ver Productos
           </Button>
         </Link>
         <Link href="/categories">
           <Button variant="outline" className="mr-2">
-            Manage Categories
+            Gestionar Categorías
           </Button>
         </Link>
         <Link href="/kardex">
           <Button variant="outline" className="mt-2 sm:mt-0">
-            Kardex Operations
+            Operaciones de Inventario
           </Button>
         </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Link href="/products">
-          <CardContainer title="Total Products" showLoader={productsLoading}>
+          <CardContainer
+            title="Total de Productos"
+            showLoader={productsLoading}
+          >
             {productsError ? (
               <p className="text-red-500">{productsError}</p>
             ) : (
@@ -78,14 +81,20 @@ export default function Dashboard() {
             )}
           </CardContainer>
         </Link>
-        <CardContainer title="Low Stock Items" showLoader={productsLoading}>
+        <CardContainer
+          title="Productos con bajas existencias"
+          showLoader={productsLoading}
+        >
           {productsError ? (
             <p className="text-red-500">{productsError}</p>
           ) : (
             <p className="text-4xl font-bold">{lowStockProducts}</p>
           )}
         </CardContainer>
-        <CardContainer title="Out of Stock" showLoader={productsLoading}>
+        <CardContainer
+          title="Productos fuera de stock"
+          showLoader={productsLoading}
+        >
           {productsError ? (
             <p className="text-red-500">{productsError}</p>
           ) : (
@@ -95,7 +104,7 @@ export default function Dashboard() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CardContainer
-          title="Monthly Sales"
+          title="Ventas mensuales"
           showLoader={salesLoading}
           loaderClassName="h-96 w-full"
         >
@@ -121,18 +130,18 @@ export default function Dashboard() {
               <div className="mt-4 flex items-center justify-center space-x-4">
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-[#10b981] mr-2"></div>
-                  <span className="text-sm">Sales ≥ 100</span>
+                  <span className="text-sm">ventas ≥ 100</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-4 h-4 bg-[#FCA5A5] mr-2"></div>
-                  <span className="text-sm">Sales &lt; 100</span>
+                  <span className="text-sm">ventas &lt; 100</span>
                 </div>
               </div>
             </>
           )}
         </CardContainer>
         <CardContainer
-          title="Products by Category"
+          title="Cantidad de Productos por Categoría"
           showLoader={categoriesLoading || productsLoading}
           loaderClassName="h-96 w-full"
         >

@@ -2,26 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { MENU_ITEMS } from "../constants";
 
 const useGetPageTitle = () => {
   const pathname = usePathname();
   const [pageTitle, setPageTitle] = useState("EasyInventory");
 
   useEffect(() => {
-    let pageTitle = "EasyInventory";
+    let pageTitle = "Sistema de Inventario";
 
     switch (pathname) {
       case "/categories":
-        pageTitle = "Categories";
+        pageTitle = MENU_ITEMS[1];
         break;
       case "/dashboard":
-        pageTitle = "Dashboard";
+        pageTitle = MENU_ITEMS[3];
         break;
       case "/kardex":
-        pageTitle = "Kardex";
+        pageTitle = MENU_ITEMS[2];
         break;
       case "/products":
-        pageTitle = "Products";
+        pageTitle = MENU_ITEMS[0];
         break;
       default:
         pageTitle;

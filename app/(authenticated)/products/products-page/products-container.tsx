@@ -79,19 +79,19 @@ export const ProductsContainer = ({ products }: Props) => {
 
   return (
     <>
-      {showLoader ? <LoadingOverlay message="Loading products..." /> : null}
+      {showLoader ? <LoadingOverlay message="Cargando los productos..." /> : null}
       <section className="space-y-3 px-3">
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <Input
             type="search"
             id="search"
-            placeholder="Search products..."
+            placeholder="Buscar productos..."
             onChange={handleSearch}
           />
         </div>
         <DropdownFilter
           variant="outline"
-          label="Order by"
+          label="Ordenar por"
           handleOrderByStock={handleOrderByStock}
           resetFilters={resetFilters}
         />

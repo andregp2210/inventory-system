@@ -15,7 +15,7 @@ export default async function Products() {
   const { data } = await supabase.from("products").select().order("createdAt");
 
   if (!data || data.length === 0) {
-    return <div>No products found</div>;
+    return <div>No se encontraron productos</div>;
   }
   return <ProductsContainer products={data}/>;
 }

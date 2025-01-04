@@ -8,7 +8,7 @@ import { categoriesCrud } from "@/lib/queries";
 import { Category } from "@/lib/types/category";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
-const LOADING_MESSAGES = ["Editing information...", "Adding category..."];
+const LOADING_MESSAGES = ["Editando información...", "Agregando categoría..."];
 
 export const CategoryFormDialog = ({
   category,
@@ -29,11 +29,11 @@ export const CategoryFormDialog = ({
         description: values.description || null,
       };
       await categoriesCrud.create(valuesToSend);
-      showSuccessAlert("Category added successfully!");
+      showSuccessAlert("¡Categoría agregada con éxito!");
       getAllCategories();
     } catch (err) {
       showErrorAlert(
-        "Failed to add category",
+        "Error al agregar la categoría",
         err instanceof Error ? err.message : "An error occurred"
       );
     } finally {
@@ -48,11 +48,11 @@ export const CategoryFormDialog = ({
         ...values,
         id: Number(values.id),
       });
-      showSuccessAlert("Category edited successfully!");
+      showSuccessAlert("¡Categoría editada con éxito!");
       getAllCategories();
     } catch (err) {
       showErrorAlert(
-        "Failed to edit category",
+        "Error al editar la categoría",
         err instanceof Error ? err.message : "An error occurred"
       );
     } finally {
@@ -80,10 +80,10 @@ export const CategoryFormDialog = ({
         />
       )}
       <SwalWrapper
-        title="Register Category"
+        title={category ? "Editar categoría" : "Agregar categoría"}
         Component={CategoryForm}
         isEdit={!!category}
-        openDialogText={category ? "Edit" : "Add category"}
+        openDialogText={category ? "Editar" : "Agregar categoría"}
         componentProps={{
           onSubmit: handleFormSubmit,
           ref: formikRef,
@@ -95,7 +95,7 @@ export const CategoryFormDialog = ({
             const isValid = formikRef.current?.isValid;
             if (!isValid) {
               Swal.showValidationMessage(
-                "Please fix the errors in the form before submitting."
+                "Por favor corrige los errores en el formulario antes de enviar."
               );
             }
           }

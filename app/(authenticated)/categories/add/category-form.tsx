@@ -7,17 +7,17 @@ import { Category } from "@/lib/types/category";
 
 const categoryFormSchema = Yup.object().shape({
   name: Yup.string()
-    .required("Nombre is required")
-    .min(3, "Nombre must be at least 3 characters"),
+    .required("El nombre es obligatorio")
+    .min(3, "El nombre debe tener al menos 3 caracteres"),
   description: Yup.string()
     .test(
       "description-validation",
-      "Descripción must be at least 10 characters",
+      "La descripción debe tener al menos 10 caracteres",
       function (value) {
         if (value && value.length > 0) {
           return value.length >= 10;
         }
-        return true; // Return true if the field is empty, as it's optional
+        return true; // Devuelve true si el campo está vacío, ya que es opcional
       }
     )
     .optional(),
@@ -88,7 +88,9 @@ export const CategoryForm = ({
             })}
           />
           {errors.description && touched.description && (
-            <p className="text-red-500 text-sm">{errors.description.toString()}</p>
+            <p className="text-red-500 text-sm">
+              {errors.description.toString()}
+            </p>
           )}
         </div>
       </Form>

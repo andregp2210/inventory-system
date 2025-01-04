@@ -139,12 +139,9 @@ export default function KardexPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold text-emerald-700">
-          Kardex Operations
-        </h1>
         <div className="flex flex-wrap gap-2">
           <Input
-            placeholder="Search entries..."
+            placeholder="Buscar por fecha o nombre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full sm:w-auto"
@@ -152,21 +149,21 @@ export default function KardexPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                Sort by <ChevronDown className="ml-2 h-4 w-4" />
+                Ordenar por <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem onClick={() => requestSort("date")}>
-                Date
+                Fecha
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => requestSort("type")}>
-                Type
+                Tipo de movimiento
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => requestSort("quantity")}>
-                Quantity
+                Cantidad
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => requestSort("totalCost")}>
-                Total Cost
+                Costo total
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -175,14 +172,14 @@ export default function KardexPage() {
             variant="outline"
             className="w-full sm:w-auto"
           >
-            <RefreshCcw className="mr-2 h-4 w-4" /> Refresh
+            <RefreshCcw className="mr-2 h-4 w-4" /> Refrescar datos
           </Button>
           <Button
             onClick={handleExport}
             variant="outline"
             className="w-full sm:w-auto"
           >
-            <Download className="mr-2 h-4 w-4" /> Export CSV
+            <Download className="mr-2 h-4 w-4" /> Exportar a CSV
           </Button>
           <KardexFormDialog
             getAllMovements={refetchMovements}
@@ -194,10 +191,10 @@ export default function KardexPage() {
         titleClassName="flex justify-between items-center"
         title={
           <>
-            <span>Kardex Entries</span>
+            <span>Entradas de Kardex</span>
             {lastUpdated && (
               <span className="text-sm font-normal text-gray-500">
-                Last updated: {lastUpdated.toLocaleString()}
+                Última actualización: {lastUpdated.toLocaleString()}
               </span>
             )}
           </>

@@ -45,8 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${oswald.variable}`}>
       <body>
-        <Header />
-        <section className="container mx-auto px-4 mb-4">{children}</section>
+        {children}
+        {/* <Header />
+        <section className="container mx-auto px-4 mb-4">{children}</section> */}
       </body>
     </html>
   );

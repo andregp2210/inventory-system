@@ -27,10 +27,10 @@ export const ProductFormDialog = ({
     try {
       const data = await productsCrud.create(values);
       setShouldRefreshProducts(true);
-      showSuccessAlert("Product added successfully!");
+      showSuccessAlert("¡Producto añadido correctamente!");
     } catch (err) {
       showErrorAlert(
-        "Failed to add product",
+        "No se ha podido añadir el producto.",
         err instanceof Error ? err.message : "An error occurred"
       );
     }
@@ -43,10 +43,10 @@ export const ProductFormDialog = ({
       const data = await productsCrud.update(values.id, values);
       console.log(data);
       setShouldRefreshProducts(true);
-      showSuccessAlert("Product edited successfully!");
+      showSuccessAlert("¡Producto editado correctamente!");
     } catch (err) {
       showErrorAlert(
-        "Failed to edit product",
+        "No se ha podido editar el producto.",
         err instanceof Error ? err.message : "An error occurred"
       );
     }
@@ -73,9 +73,9 @@ export const ProductFormDialog = ({
         />
       ) : null}
       <SwalWrapper
-        title="Register Product"
+        title={product ? "Editar producto" : "Registrar producto"}
         Component={ProductForm}
-        openDialogText={product ? "Edit" : "Add product"}
+        openDialogText={product ? "Editar" : "Agregar producto"}
         isEdit={!!product}
         componentProps={{
           categories,
@@ -89,7 +89,7 @@ export const ProductFormDialog = ({
             const isValid = formikRef.current?.isValid;
             if (!isValid) {
               Swal.showValidationMessage(
-                "Please fix the errors in the form before submitting."
+                "Por favor, corrija los errores del formulario antes de enviarlo."
               );
             }
           }
