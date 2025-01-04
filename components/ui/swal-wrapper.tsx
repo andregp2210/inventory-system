@@ -29,6 +29,30 @@ export const SwalWrapper = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
 
+  useEffect(() => {
+    const closeSwal = () => {
+      if (modalOpen) {
+        Swal.close();
+        setModalOpen(false);
+      }
+    };
+
+    const handleBackButton = (e: Event) => {
+      if (modalOpen) {
+        closeSwal();
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("popstate", handleBackButton);
+
+    window.history.replaceState(null, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [modalOpen]);
+
   const showSwal = () => {
     MySwal.fire({
       title,
@@ -42,6 +66,7 @@ export const SwalWrapper = ({
       didOpen: () => {
         const popup = Swal.getPopup();
         setModalOpen(true);
+        history.pushState({ swalOpen: true }, "SwalModal");
         if (popup) {
           popup.style.zIndex = "9";
           popup.querySelector("input")?.focus();
@@ -56,34 +81,11 @@ export const SwalWrapper = ({
           throw err;
         }
       },
+      willClose: () => {
+        setModalOpen(false);
+      },
     });
   };
-
-  useEffect(() => {
-    const closeSwal = () => {
-      if (modalOpen) {
-        Swal.close();
-        setModalOpen(false);
-      }
-    };
-
-    // Handle the back button event using the navigator object on mobile devices
-    const handleBackButton = (e: Event) => {
-      if (modalOpen) {
-        closeSwal();
-        e.preventDefault(); // Prevent the default back action
-      }
-    };
-
-    // Attach the back button listener on mobile devices
-    if (navigator.userAgent.match(/Android|iPhone|iPad|Mobile/i)) {
-      window.addEventListener("popstate", handleBackButton);
-    }
-
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, [modalOpen]);
 
   return (
     <Button

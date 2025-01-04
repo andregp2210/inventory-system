@@ -36,13 +36,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <CardContainer title="Total Products" showLoader={productsLoading}>
-          {productsError ? (
-            <p className="text-red-500">{productsError}</p>
-          ) : (
-            <p className="text-4xl font-bold">{totalProducts}</p>
-          )}
-        </CardContainer>
+        <Link href="/products">
+          <CardContainer title="Total Products" showLoader={productsLoading}>
+            {productsError ? (
+              <p className="text-red-500">{productsError}</p>
+            ) : (
+              <p className="text-4xl font-bold">{totalProducts}</p>
+            )}
+          </CardContainer>
+        </Link>
         <CardContainer title="Low Stock Items" showLoader={productsLoading}>
           {productsError ? (
             <p className="text-red-500">{productsError}</p>
@@ -119,10 +121,14 @@ export default function Dashboard() {
           </Button>
         </Link>
         <Link href="/categories">
-          <Button variant="outline" className="mr-2">Manage Categories</Button>
+          <Button variant="outline" className="mr-2">
+            Manage Categories
+          </Button>
         </Link>
         <Link href="/kardex">
-          <Button variant="outline" className="mt-2">Kardex Operations</Button>
+          <Button variant="outline" className="mt-2">
+            Kardex Operations
+          </Button>
         </Link>
       </div>
     </div>
