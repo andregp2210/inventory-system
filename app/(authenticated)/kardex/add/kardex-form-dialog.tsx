@@ -27,13 +27,17 @@ export const KardexFormDialog = ({
     try {
       setShowLoader(true);
       const valuesToSend: KardexEntry = {
-        productId: Number(values.productId),
-        movementType: values.movementType,
-        quantity: values.quantity,
-        locationId: 1,
-        movementDate: values.movementDate,
+        _productId: Number(values.productId),
+        _locationId: 1,
+        _movementType: values.movementType,
+        _quantity: values.quantity,
+        _movementDate: values.movementDate,
+        _createdBy: "admin",
+        _customerId: null,
+        _supplierId: null,
+        _notes: "notes",
       };
-      await movementsCrud.create(valuesToSend);
+      await movementsCrud.execFunction("insert_kardex_movement", valuesToSend);
       showSuccessAlert("¡Movimiento añadido con éxito!");
       getAllMovements();
     } catch (err) {

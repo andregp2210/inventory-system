@@ -7,6 +7,7 @@ import { Category } from "@/lib/types/category";
 
 const useProductsData = () => {
   const [salesData, setSalesData] = useState<SalesDataChart[]>([]);
+  const [inventoryTotalCost, setInventoryTotalCost] = useState<number>(0);
   const [lowStockProducts, setLowStockProducts] = useState<number>(0);
   const [totalProducts, setTotalProducts] = useState<number>(0);
   const [outOfStock, setOutOfStock] = useState<number>(0);
@@ -26,7 +27,7 @@ const useProductsData = () => {
     error: productsError,
   } = useRequest<Product[]>(
     productsCrud.getAll,
-    "categoryId,currentStock,minimumStock,id"
+    "categoryId,currentStock,minimumStock,id, unitPrice"
   );
 
   const {
@@ -34,7 +35,7 @@ const useProductsData = () => {
     loading: salesLoading,
     error: salesError,
   } = useRequest(movementsCrud.execFunction, "get_monthly_totals", {
-    year_filter: 2024,
+    year_filter: 2025,
   });
 
   useEffect(() => {
@@ -48,6 +49,10 @@ const useProductsData = () => {
         (product) => product.currentStock === 0
       ).length;
       setOutOfStock(outOfStockCount);
+      const totalCost = products.reduce((acc, product) => {
+        return acc + product.unitPrice * product.currentStock;
+      }, 0);
+      setInventoryTotalCost(totalCost);
       if (!categoriesLoading && categories) {
         const productsByCategories = categories.map((category) => ({
           name: category.name,
@@ -71,6 +76,7 @@ const useProductsData = () => {
   ]);
 
   return {
+    inventoryTotalCost,
     salesData,
     lowStockProducts,
     totalProducts,

@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import CardContainer from "@/components/ui/card-container";
 import useProductsData from "@/hooks/use-get-dashboard-data";
+import { formatToLocalCurrency } from "@/lib/utils";
 
 const COLORS = [
   "#FF6F61",
@@ -43,6 +44,7 @@ export default function Dashboard() {
     totalProducts,
     outOfStock,
     salesData,
+    inventoryTotalCost,
     productsByCategory,
     salesError,
     productsError,
@@ -99,6 +101,16 @@ export default function Dashboard() {
             <p className="text-red-500">{productsError}</p>
           ) : (
             <p className="text-4xl font-bold">{outOfStock}</p>
+          )}
+        </CardContainer>
+        <CardContainer
+          title="Valor total de inventario"
+          showLoader={productsLoading}
+        >
+          {productsError ? (
+            <p className="text-red-500">{productsError}</p>
+          ) : (
+            <p className="text-4xl font-bold">{formatToLocalCurrency(inventoryTotalCost)}</p>
           )}
         </CardContainer>
       </div>

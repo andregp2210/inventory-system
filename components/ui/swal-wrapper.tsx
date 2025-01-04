@@ -10,7 +10,7 @@ export const SwalWrapper = ({
   title,
   Component,
   openDialogText,
-  confirmButtonText = "Submit",
+  confirmButtonText = "Guardar",
   componentProps,
   onPreConfirm,
   onError,
@@ -59,6 +59,7 @@ export const SwalWrapper = ({
       html: <Component {...componentProps} />,
       showCancelButton: true,
       confirmButtonText,
+      cancelButtonText: "Cancelar",
       customClass: {
         confirmButton: "bg-primary",
         cancelButton: "bg-destructive",

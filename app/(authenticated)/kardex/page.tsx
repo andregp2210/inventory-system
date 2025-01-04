@@ -40,7 +40,7 @@ export default function KardexPage() {
     movementsCrud.execFunction,
     "get_kardex_data",
     {
-      year_filter: 2024,
+      year_filter: 2025,
     }
   );
 

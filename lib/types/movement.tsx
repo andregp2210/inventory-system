@@ -33,9 +33,13 @@ export type KardexRecord = {
 };
 
 export type KardexEntry = {
-  movementType: "entry" | "exit";
-  productId: number;
-  quantity: number;
-  locationId: number | null;
-  movementDate: string;
+  _movementType: "entry" | "exit";
+  _productId: number;
+  _quantity: number;
+  _locationId: number | null;
+  _movementDate: string;
+  _createdBy: string;
+  _customerId: number | null;
+  _supplierId: number | null;
+  _notes: string | null;
 };
